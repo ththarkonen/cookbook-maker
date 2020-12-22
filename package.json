@@ -62,7 +62,7 @@
     "electron-vue": "0.0.1",
     "jquery": "^3.5.1",
     "jsdom": "^16.4.0",
-    "nan": "^2.14.0",
+    "nan": "2.14.0",
     "node-gyp-build": "^4.2.3",
     "node-pre-gyp": "^0.17.0",
     "promise": "^8.1.0",
