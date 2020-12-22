@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>cookbook</title>
+    <% if (htmlWebpackPlugin.options.nodeModules) { %>
+      <!-- Add `node_modules/` to global paths so `require` works properly in development -->
+      <script>
+        require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
+      </script>
+    <% } %>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!-- Set `__static` path to static files in production -->
+      <script>
+        console.log(process.env.NODE_ENV)
+        const path = require('path');
+        window.__publicPath = path.join( process.cwd(), '/public/');
+        window.__pdfViewerPath = path.join( process.cwd(), '/public/pdfjs/web/viewer.html');
+      </script>
+      <% if (!htmlWebpackPlugin.options.isBrowser && !htmlWebpackPlugin.options.isDevelopment) { %>
+      <script>
+          if( !( process.env.NODE_ENV == 'development' ) ){
+            window.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\');
+            window.__publicPath = path.join( process.cwd(), 'resources', '/public/');
+            window.__pdfViewerPath = path.join( process.cwd(), 'resources', '/public/pdfjs/web/viewer.html');
+          }
+      </script>
+      <% } %>
+    <!-- webpack builds are automatically injected -->
+    <script>
+      global.jQuery = require('jquery');
+      var $ = global.jQuery;
+      window.$ = $;
+    </script>
+  </body>
+</html>
