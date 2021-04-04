@@ -61,7 +61,7 @@
 
     <!-- Modals -->
     <addRecipeModal ref="addRecipeModal" :id="'addRecipeModal'" v-on:recipeAdded="addRecipe" v-on:recipeEdited="editRecipe"></addRecipeModal>
-    <addTopicModal  :id="'addTopicModal'" v-on:topicAdded="addTopic"></addTopicModal>
+    <addTopicModal  ref="addTopicModal" :id="'addTopicModal'" v-on:topicAdded="addTopic"></addTopicModal>
   </div>
 </template>
 
@@ -116,7 +116,6 @@ export default {
 
       if(savingMode){
         console.log("Starting a new recipe")
-        this.$refs.addRecipeModal.clearRecipe();
       } else {
 
         var ul_recipes = e.path[3];
@@ -144,6 +143,9 @@ export default {
     },
 
     openTopicMenu() {
+
+      this.$refs.addTopicModal.clearTopic();
+
       console.log("Adding a topic");
       $('#addTopicModal').modal('show')
     },
@@ -154,6 +156,7 @@ export default {
       newRecipeObject.order = this.counter;
       this.recipes.push(newRecipeObject);
 
+      this.$refs.addRecipeModal.clearRecipe();
       this.saveJSON();
     },
 
@@ -225,8 +228,8 @@ export default {
 
     saveJSON() {
 
-      const recipeListJSON = JSON.stringify( this.recipes, null, 2);
-      const tocJSON = JSON.stringify( this.tableOfContents, null, 2);
+      var recipeListJSON = JSON.stringify( this.recipes, null, 2);
+      var tocJSON = JSON.stringify( this.tableOfContents, null, 2);
 
       if (!fs.existsSync(this.appDataPath)) {
           fs.mkdirSync( this.appDataPath, { recursive: true });

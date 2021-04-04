@@ -4,6 +4,7 @@ var fs = require('fs');
 const {spawn} = require('child_process');
 
 const fractionRegExp = /[1-9][0-9]*\/[1-9][0-9]*/g;
+const percentageRegExp = /(?<!\\)%/g;
 
 module.exports = {
 
@@ -14,6 +15,9 @@ module.exports = {
       console.log("Compiling the tex files...")
 
       var mainTex = createPreamble();
+
+      console.log(mainTex)
+
       console.log(tocObjects)
       for(var ii = 0; ii < tocObjects.length; ii++){
 
@@ -21,7 +25,7 @@ module.exports = {
         console.log(tempItem);
         console.log(tempItem.class)
 
-        if(tempItem.class == "topic"){
+        if (tempItem.class == "topic") {
           mainTex += addSection(tempItem.text);
         } else if (tempItem.class == "recipe") {
 
@@ -135,6 +139,7 @@ function createPreamble() {
   preambleStr += "]{\\thestep}{}}\n";
 
   preambleStr += "\\begin{document}\n";
+
   preambleStr += "\\renewcommand{\\contentsname}{Sisällysluettelo}\n"
   preambleStr += "\\tableofcontents\n";
   preambleStr += "\\newpage\n";
@@ -158,13 +163,13 @@ function createRecipeFile( recipeObj, texPath ) {
   const amounts = recipeObj.amounts;
   const steps = recipeObj.steps;
 
-  const prepHoursExist = ( recipeObj.preparationTimeHours > 0 );
-  const prepMinsExist = ( recipeObj.preparationTimeMins > 0 );
+  const prepHoursExist = ( recipeObj.preparationTimeHours != 0 && recipeObj.preparationTimeHours != "" );
+  const prepMinsExist = ( recipeObj.preparationTimeMins != 0 && recipeObj.preparationTimeMins != "" );
   const prepTimeExist = prepHoursExist || prepMinsExist;
 
-  const cookHoursExist = ( recipeObj.cookingTimeHours > 0 );
-  const cookMinsExist = ( recipeObj.cookingTimeMins > 0 );
-  const temperatureExist = ( recipeObj.cookingTemperature > 0 );
+  const cookHoursExist = ( recipeObj.cookingTimeHours != 0 && recipeObj.cookingTimeHours != "" );
+  const cookMinsExist = ( recipeObj.cookingTimeMins != 0 && recipeObj.cookingTimeMins != "" );
+  const temperatureExist = ( recipeObj.cookingTemperature != 0 && recipeObj.cookingTemperature != "" );
   const cookingTimeExist = cookHoursExist || cookMinsExist;
 
   const portionsExist = ( recipeObj.portions.trim() != "" );
@@ -175,11 +180,11 @@ function createRecipeFile( recipeObj, texPath ) {
     str += "preparationtime = {";
 
     if( prepHoursExist ){
-      str += "\\unit[" + recipeObj.preparationTimeHours + "]{h} ";
+      str += "\\unit[" + recipeObj.preparationTimeHours.replace( percentageRegExp,"\\%") + "]{h} ";
     };
 
     if( prepMinsExist ){
-      str += "\\unit[" + recipeObj.preparationTimeMins + "]{min}";
+      str += "\\unit[" + recipeObj.preparationTimeMins.replace( percentageRegExp,"\\%") + "]{min}";
     }
 
     str += "},\n";
@@ -190,34 +195,34 @@ function createRecipeFile( recipeObj, texPath ) {
     str += "bakingtime = {";
 
     if( cookHoursExist ){
-      str += "\\unit[" + recipeObj.cookingTimeHours + "]{h} ";
+      str += "\\unit[" + recipeObj.cookingTimeHours.replace( percentageRegExp,"\\%") + "]{h} ";
     };
 
     if( cookMinsExist ){
-      str += "\\unit[" + recipeObj.cookingTimeMins + "]{min}";
+      str += "\\unit[" + recipeObj.cookingTimeMins.replace( percentageRegExp,"\\%") + "]{min}";
     };
 
     str += "},\n";
   };
 
   if( temperatureExist ){
-    str += "bakingtemperature = {\\unit[" + recipeObj.cookingTemperature + "]{\\textcelcius}},\n";
+    str += "bakingtemperature = {\\unit[" + recipeObj.cookingTemperature.replace( percentageRegExp,"\\%") + "]{\\textcelcius}},\n";
   };
 
   if( portionsExist ){
-    str += "portion = {\\portion{" + recipeObj.portions + "}},";
+    str += "portion = {\\portion{" + recipeObj.portions.replace( percentageRegExp,"\\%") + "}},";
   };
 
   str += "]\n";
 
-  str += "{" + recipeObj.text + "}\n";
+  str += "{" + recipeObj.text.replace( percentageRegExp,"\\%") + "}\n";
   str += "\\ingredients{%\n";
 
   for(var ii = 0; ii < ings.length; ii++){
 
-    const tempAmount = replaceFraction( amounts[ii] );
+    const tempAmount = replaceFraction( amounts[ii] ).replace( percentageRegExp,"\\%");
 
-    str += tempAmount + " & " + ings[ii] + "\\\\ \n";
+    str += tempAmount + " & " + ings[ii].replace( percentageRegExp,"\\%") + "\\\\ \n";
   };
 
   str += "}\n";
@@ -225,19 +230,23 @@ function createRecipeFile( recipeObj, texPath ) {
   str += "\\preparation{%\n";
 
   for(var ii = 0; ii < steps.length; ii++){
-    str += "\\step \\steptext{" + steps[ii] + "}\n";
+    str += "\\step \\steptext{" + steps[ii].replace( percentageRegExp,"\\%") + "}\n";
   };
 
   str += "}\n";
 
   str += "\\suggestion{%\n";
-  str += recipeObj.suggestion + "\n";
+  str += recipeObj.suggestion.replace( percentageRegExp,"\\%") + "\n";
   str += "}\n";
 
   str += "\\hint{%\n";
-  str += "~" +recipeObj.tip + "\n";
+  str += "~" +recipeObj.tip.replace( percentageRegExp,"\\%") + "\n";
   str += "}\n";
   str += "\\end{recipe}";
+
+  console.log(str)
+
+  console.log(texPath)
 
   const filePath = path.join( texPath, recipeObj.file);
   fs.writeFileSync( filePath, str);

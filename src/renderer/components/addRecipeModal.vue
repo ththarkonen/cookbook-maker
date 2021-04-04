@@ -116,7 +116,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Peruuta</button>
+          <button type="button" class="btn btn-secondary btn-cancel pull-left" data-dismiss="modal">Sulje</button>
+          <button type="button" class="btn btn-secondary btn-cancel pull-left" v-on:click="clearRecipe">Tyhjennä</button>
           <button type="button" class="btn btn-primary btn-recipe" v-on:click="addRecipe">Tallenna</button>
         </div>
       </div>
@@ -203,6 +204,9 @@
           var tempIng = ingredientLines[ii].children[0].innerHTML;
           var tempAmount = ingredientLines[ii].children[1].innerHTML;
 
+          tempIng = tempIng.replace(/&nbsp;/g, " ");
+          tempAmount = tempAmount.replace(/&nbsp;/g, " ");
+
           ingredients.push(tempIng);
           amounts.push(tempAmount);
         };
@@ -210,6 +214,8 @@
         for( var ii = 0; ii < stepLines.length; ii++){
 
           var tempStep = stepLines[ii].children[0].innerHTML;
+
+          tempStep = tempStep.replace(/&nbsp;/g, " ");
           steps.push(tempStep);
         };
 
@@ -299,6 +305,7 @@
         refs.cookMins.value = "";
         refs.cookTemp.value = "";
 
+        refs.suggestion.value = "";
         refs.tip.value = "";
       }
 

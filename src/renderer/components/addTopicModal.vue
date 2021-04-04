@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Peruuta</button>
+          <button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Sulje</button>
           <button type="button" class="btn btn-primary btn-recipe" v-on:click="addTopic">Lisää</button>
         </div>
       </div>
@@ -38,6 +38,13 @@
 
           this.$emit("topicAdded", topicObj);
           $('#addTopicModal').modal('hide')
+
+          this.clearTopic();
+        },
+
+        clearTopic(){
+
+          this.$refs.topicName.value = "";
         },
 
       }
